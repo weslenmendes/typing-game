@@ -1,46 +1,45 @@
 import React, { useState, useEffect } from 'react';
 
-import wordList from './resources/words.json';
+import Word from './components/Word';
 
-const getWord = () => {
-  const index = Math.floor(Math.random() * wordList.length);
-  const word = wordList[index];
-  return word.toLowerCase();
-};
-
-const isValidKeys = (key, word) => {
-  if (!word) return false;
-
-  const result = word.split('').includes(key);
-
-  return result;
-};
-
-const Word = ({ word, validKeys }) => {
-  if (!word) return null;
-
-  const joinedKeys = validKeys.join('');
-  const matched = word.slice(0, joinedKeys.length);
-  const remainder = word.slice(joinedKeys.length);
-
-  return (
-    <>
-      <span className="matched">{matched}</span>
-      <span className="remainder">{remainder}</span>
-    </>
-  );
-};
+import getWord from './utils/getWord';
+import isValidKeys from './utils/isValidKeys';
 
 const MAX_TYPED_KEYS = 30;
 
 const App = () => {
   const [typedKeys, setTypedKeys] = useState([]);
   const [validKeys, setValidKeys] = useState([]);
+  const [completedWords, setCompletedWords] = useState([]);
   const [word, setWord] = useState('');
 
   useEffect(() => {
     setWord(getWord());
   }, []);
+
+  useEffect(() => {
+    const wordFromValidKeys = validKeys.join('').toLowerCase();
+    let setTimeoutID;
+
+    if (word && word === wordFromValidKeys) {
+      let newWord = null;
+      do {
+        newWord = getWord();
+      } while (completedWords.includes(newWord));
+
+      if (validKeys.length === word.length) {
+        setTimeoutID = setTimeout(() => {
+          setWord(newWord);
+          setValidKeys([]);
+          setCompletedWords((prev) => [...prev, word]);
+        }, 300);
+      }
+    }
+
+    return () => {
+      clearTimeout(setTimeoutID);
+    };
+  }, [word, validKeys, completedWords]);
 
   const handleKeyDown = (e) => {
     e.preventDefault();
@@ -66,9 +65,9 @@ const App = () => {
       <div className="typed-keys">{typedKeys}</div>
       <div className="completed-words">
         <ol>
-          <li>cidade</li>
-          <li>carro</li>
-          <li>profissional</li>
+          {completedWords.map((word) => (
+            <li key={word}>{word}</li>
+          ))}
         </ol>
       </div>
     </div>

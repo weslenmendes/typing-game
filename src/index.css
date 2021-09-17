@@ -39,6 +39,23 @@ body {
   color: #282c34;
 }
 
+.container .valid-keys .matched.animated {
+  display: inline-block;
+  background-color: none;
+  animation: slideDown 0.3s forwards;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(200px);
+    opacity: 0;
+  }
+}
+
 .container .valid-keys .remainder {
   opacity: 0.5;
 }
@@ -51,7 +68,7 @@ body {
   top: 0;
   right: 0;
   text-align: left;
-  padding: 20px 40px;
+  padding: 20px 40px 20px 80px;
   font-size: 1.8rem;
   line-height: 2.5rem;
   opacity: 0.5;
